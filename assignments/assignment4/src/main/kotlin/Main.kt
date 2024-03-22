@@ -60,9 +60,18 @@ fun benchmark(array: IntArray, printOut: Boolean = true, numRuns: Int = 20000): 
         println("insertionSort: ${insertionAvg / numRuns}")
         println()
     }
-    return arrayOf(heapAvg/numRuns, mergeAvg/numRuns, selectionAvg/numRuns, insertionAvg/numRuns)
+    return arrayOf(heapAvg/numRuns, mergeAvg/numRuns,
+        selectionAvg/numRuns, insertionAvg/numRuns)
 }
 
+/**
+ * Randomly generates integer arrays with numbers from 0 to 100 for numbers
+ * of a given length; prints out average runtimes for sorting those sequences
+ * using heapSort, mergeSort, selectionSort, and insertionSort
+ *
+ * @param randRuns Number of runs/random sequences it will generate to be sorted
+ * @param arrayLength Length of the desired random sequences
+ */
 fun randomSequenceBench(randRuns: Int, arrayLength: Int) {
     // random array
     val range = 100
