@@ -1,8 +1,8 @@
 ## Lempel-Ziv Compression Benchmarking
-My implementation of Lempel-Ziv compression is as a string compression 
-algorithm that exploits repetitiveness from its input string. The more times 
-a substring is encountered, the more of it the algorithm will save until 
-entire commmonly occurring substrings become associated with single integers
+My implementation of Lempel-Ziv compression is a string compression 
+algorithm that exploits repetitiveness. The more times a substring is 
+encountered, the more of it the algorithm will save until progressively
+larger commonly occurring substrings become associated with single integers
 within a generated codebook. 
 
 It would therefore follow that the more repetitive a string is, the more
