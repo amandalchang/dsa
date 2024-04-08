@@ -16,8 +16,9 @@ class LempelZivTest {
         val lempelZiv = LempelZiv(input, true)
         assert(expectedBinary == lempelZiv.encode())
 
-
         // Testing the Peter Shor example, although I edited the last portion
+        // since I decided to always end with an innovation symbol (it would only
+        // save one bit of storage to implement ending with a substring code).
         val peterShorExample = "AABABBBABAABABBBABBABB"
         val expectedOutput = "0011101001010010111001011001001"
         val shorLempelZiv = LempelZiv(peterShorExample)
