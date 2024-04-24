@@ -21,6 +21,8 @@ class Matrix (private val n: Int) {
     operator fun set(i: Int, j: Int, num: Double) {
         if (i in 0..<n && j in 0..<n) {
             data[i][j] = num
+        } else {
+            throw Exception("Index out of range")
         }
     }
 
@@ -30,7 +32,11 @@ class Matrix (private val n: Int) {
      * @param j the index of the column (zero indexing)
      */
     operator fun get(i: Int, j: Int): Double {
-        return data[i][j]
+        if (i in 0..<n && j in 0..<n) {
+            return data[i][j]
+        } else {
+            throw Exception("Provided indices not in matrix")
+        }
     }
 
     /**
