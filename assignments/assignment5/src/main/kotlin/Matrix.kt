@@ -8,24 +8,35 @@ package org.example
  * @param n the size parameter of the nxn square matrix object
  */
 class Matrix (private val n: Int) {
-    val data: Array<DoubleArray> = Array(n) {DoubleArray(n)}
+    private val data: Array<DoubleArray> = Array(n) {DoubleArray(n)}
 
+    /**
+     * Sets the value at index [i],[j] in the matrix to be
+     * [num]
+     * @param i the index of the row (zero indexing)
+     * @param j the index of the column (zero indexing)
+     * @param num the Double whose value will be placed at the position
+     * specified
+     */
     operator fun set(i: Int, j: Int, num: Double) {
         if (i in 0..<n && j in 0..<n) {
             data[i][j] = num
         }
     }
 
+    /**
+     * Returns the value at the index [i],[j] in the matrix
+     * @param i the index of the row (zero indexing)
+     * @param j the index of the column (zero indexing)
+     */
     operator fun get(i: Int, j: Int): Double {
         return data[i][j]
     }
 
     /**
-     * Multiply [this] matrix by [other].
-     * You can implement this either using block-based matrix multiplication or
-     * traditional matrix multiplication (the kind you learn about in math
-     * classes!)
-     * @return [this]*[other] if the dimensions are compatible and null otherwise
+     * Multiply [this] square matrix by [other] square matrix.
+     * @return [this]*[other] if the dimensions are compatible and throws
+     * an incompatible sizes exception otherwise
      */
     operator fun times(other: Matrix): Matrix {
         if (this.n != other.n) throw Exception("Incompatible sizes")
@@ -40,6 +51,11 @@ class Matrix (private val n: Int) {
         return product
     }
 
+    /**
+     * Adds [this] to [other]
+     * @return [this] + [other] if the dimensions are the same and throws
+     * an incompatible sizes exception otherwise
+     */
     operator fun plus(other: Matrix): Matrix {
         if (this.n != other.n) throw Exception("Incompatible sizes")
         val sum = Matrix(n)
@@ -51,6 +67,11 @@ class Matrix (private val n: Int) {
         return sum
     }
 
+    /**
+     * Subtracts [other] from [this]
+     * @return [this] - [other] if the dimensions are the same and throws
+     * an incompatible sizes exception otherwise
+     */
     operator fun minus(other: Matrix): Matrix {
         if (this.n != other.n) throw Exception("Incompatible sizes")
         val sub = Matrix(n)
@@ -97,7 +118,12 @@ class Matrix (private val n: Int) {
         return M
     }
 
-    fun splitMatrix(): Array<Matrix> {
+    /**
+     * Splits a matrix with side lengths divisible by two into four equal
+     * portions
+     * @return an array of the four matrices
+     */
+    private fun splitMatrix(): Array<Matrix> {
         val A11 = Matrix(n/2)
         val A12 = Matrix(n/2)
         val A21 = Matrix(n/2)
