@@ -12,6 +12,10 @@ class NeedlemanWunsch(private val seqOne: String, private val seqTwo: String) {
     private val width = seqTwo.length + 1
     private val nwMatrix: MutableList<MutableList<Score>> =
         MutableList(height) {MutableList(width) {Score(0, 0)}}
+    // The initialization function fills in the matrix with the starting scores
+    // from matching any character with epsilon (as referred to in the Needleman
+    // Wunsch wikipedia page). We end up with a filled topmost row and leftmost
+    // column.
     init{
         for (j in 0..<width) {
             nwMatrix[0][j] = Score(1, -j)
