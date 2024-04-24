@@ -1,206 +1,247 @@
 package org.example
-interface BinarySearchTree<Int> {
-    fun isEmpty(): Boolean
-}
-class RedBlackTree<T:Comparable<T>>: BinarySearchTree<Int> {
-    private var nilNode: Node<Int> = Node(null, null, null, null, false)
 
-    init {
-        nilNode.left = nilNode
-        nilNode.right = nilNode
-        nilNode.parent = nilNode
-    }
-
-    private var root = nilNode
+import kotlin.math.max
+class RedBlackTree<T:Comparable<T>> {
+    private var root = getNilNode<T>()
     private var size = 0
 
-
-    fun insert(data: Int) {
-        val z = Node(nilNode, nilNode, nilNode, data, true)
+    /**
+     * Lookup function that returns the node if k is in the tree and a black nil
+     * node (a node with null for all properties but color) if k is not
+     * @param k the value being searched for in the tree
+     * @return the node with value k or the nil node
+     */
+    fun search(k: T): Node<T> {
         var current = root
-        var newParent = nilNode
+        while (current.data != null && k != current.data) {
+            if (k < current.data!!) {
+                current = current.left!!
+            } else {
+                current = current.right!!
+            }
+        }
+        return current
+    }
 
-        while (current != nilNode) {
+    /**
+     * Inserts a node with [data] into the red-black tree and makes corrections
+     * as necessary to maintain the tree properties
+     */
+    fun insert(data: T) {
+        val z = Node(getNilNode(), getNilNode(), getNilNode(), data, true)
+        var current = root
+        var newParent = getNilNode<T>()
+
+        while (current.data != null) {
             if (data > current.data!!) {
                 newParent = current
-                current = current.right ?: nilNode
+                current = current.right ?: getNilNode()
             } else {
                 newParent = current
-                current = current.left ?: nilNode
+                current = current.left ?: getNilNode()
             }
         }
         z.parent = newParent
         when {
-            newParent == nilNode -> root = z
+            newParent.data == null -> root = z
             data < newParent.data!! -> newParent.left = z // data is only null for nilNode
             data > newParent.data!! -> newParent.right = z
             else -> throw Exception("ERROR: Duplicate values in BST")
         }
         insertFixup(z)
+        size++
     }
-    //     def insert_fixup(self, z):
-    //        while z.p and z.p.color == RED:
-    //            if z.p == z.p.p.left:
-    //                y = z.p.p.right
-    //                if y.color == RED:
-    //                    z.p.color = BLACK
-    //                    y.color = BLACK
-    //                    z.p.p.color = RED
-    //                    z = z.p.p
-    //                else:
-    //                    if z == z.p.right:
-    //                        z = z.p
-    //                        self.left_rotate(z)
-    //                    z.p.color = BLACK
-    //                    z.p.p.color = RED
-    //                    self.right_rotate(z.p.p)
-    //            else:
-    //                y = z.p.p.left
-    //                if y.color == RED:
-    //                    z.p.color = BLACK
-    //                    y.color = BLACK
-    //                    z.p.p.color = RED
-    //                    z = z.p.p
-    //                else:
-    //                    if z == z.p.left:
-    //                        z = z.p
-    //                        self.right_rotate(z)
-    //                    z.p.color = BLACK
-    //                    z.p.p.color = RED
-    //                    self.left_rotate(z.p.p)
-    //            if z == self.root:
-    //                break
-    //        self.root.color = BLACK
-     fun insertFixup(z: Node<Int>) {
-        while (z.parent != nilNode && z.parent!!.color) {
-            if (z.parent == z.parent.parent.left) {
-                if (z.parent.parent.right.color) {   // red uncle, recolor
+
+
+    /**
+     * Corrects the tree properties that may have been broken by the insertion
+     * of [startNode] via rotations and recolorings.
+     * @param startNode the newly inserted node
+     */
+    private fun insertFixup(startNode: Node<T>) {
+         var z = startNode
+         while (z.parent?.data != null && z.parent!!.color) {
+            if (z.parent == z.parent?.parent!!.left) {
+                if (z.parent?.parent?.right!!.color) {   // red uncle, recolor
                     z.recolor()
-                    z = z.parent.parent
+                    z = z.parent?.parent!!
                 } else {                // rotate parent, triangle case
-                    if (z == z.parent.right) {
-                        z = z.parent
+                    if (z == z.parent!!.right) {
+                        z = z.parent!!
+                        println("I am left rotating $z")
                         z.leftRotate()
                     }
-                    z.parent.color = 0
-                    z.parent.parent.color = 1
-                    z.parent.parent.rightRotate()
+                    z.parent?.color = false
+                    z.parent?.parent!!.color = true
+                    println("I am right rotating ${z.parent?.parent!!}")
+                    z.parent?.parent!!.rightRotate()
                 }
             } else {
-                if (z.parent.parent.left.color) {
+                if (z.parent?.parent?.left!!.color) {
                     z.recolor()
-                    z = z.parent.parent
+                    z = z.parent?.parent!!
                 } else {
-                    if (z == z.parent.left) {
+                    if (z == z.parent!!.left) {
                         // rotate parent, opposite triangle case
-                        z = z.parent
+                        z = z.parent!!
+                        println("I am right rotating ${z}")
                         z.rightRotate()
                     }
-                    z.parent.color = 0
-                    z.parent.parent.color = 1
-                    z.parent.parent.leftRotate()
+                    z.parent?.color = false
+                    z.parent?.parent?.color = true
+                    println("I am left rotating ${z.parent?.parent}")
+                    z.parent?.parent?.leftRotate()
                 }
             }
             if (z == root) {
                 break
             }
-        }
-        root.color = 0
-    }
-
-//    fun insertFixup(z: Node<Int>) {
-//        while ((z.parent != nilNode) && z.parent!!.color) {
-//            if (z == root) return
-//            if (z.parent!!.parent != nilNode) {
-//                when {
-//                    z.parent == z.parent!!.parent!!.left -> leftFixup()
-//                    z.parent == z.parent!!.parent!!.right -> rightFixup()
-//                }
-//            }
-//            }
-//        }
-//        when {
-//            z == root -> z.color = 0 // recoloring z black in case 1
-//            z.uncle().color = 1 -> z.recolorPrntGrprntUnc()
-//            z.uncle().color == 0 && isTriangleFormed() -> if (z.parent z.parent.rotate()
-//            z.uncle().color == 0 && isLineFormed() -> z.parent.parent.rotate()
-//        }
-
-    fun isTriangleFormed(z: Node<Int>) {
-        if (z.parent?.data > z) {
-
-
-
-    }
-
-
-
-    /**
-     * Returns true if z, its parent and its grandparent form a triangle
-     * @param z the node causing the graph to not be a Red-Black BST
-     */
-    fun isTriangleFormed(z: Node<Int>?) {
-        if (z == z.parent.parent.right.right || z == z.parent.parent.left.left){
-            return true
-        }
-        return false
+         }
+         while (root.parent?.data != null) {
+             root = root.parent!!
+         }
+         root.color = false
     }
 
     /**
-     * Returns true if a line is formed by z, its parent and its grandparent
-     * @param z the node causing the graph to not be a Red-Black BST
+     * Returns the integer height of the red-black tree
      */
-    fun isLineFormed(z: Node<Int>?) {
-        z?.parent?.parent?.left?.right?.let {
-            if (z == z.parent.parent.left.right || z == z.parent.parent.right.left){
-                return true
-            }
-        }
+    fun getHeight(): Int {
+        return root.getHeight() ?: 0
     }
-        return false
+
+    /**
+     * Returns true if the conditions:
+     * 1. all red nodes have black trees
+     * 2. the root node is black
+     * 3. all leaves are black
+     * 4. there are equal numbers of black nodes on every branch
+     * are all true, otherwise returns false
+     */
+    fun checkInvariants() : Boolean {
+        try {
+            root.countBlackNodes()
+            return root.checkBlackLeaves() &&
+                    root.checkRedChildren() &&
+                    !root.color
+        } catch (e: Exception) {
+            return false
+        }
+
     }
 
     /**
      * @return true if the list is empty and false otherwise
      */
-    override fun isEmpty(): Boolean {
+    fun isEmpty(): Boolean {
         return (size == 0)
     }
 }
 
 /**
- * Stores the value within the stack and the location of the next value
- * @param T the type of data to store
- * @property left the left node in our Triply Linked List
- * @property right the right node in our Triply Linked List
- * @property parent the parent node in our Binary Search Tree
- * @property data the string data associated the node
- * @property color the boolean representation of node color (red: true, black: false)
+ * Represents a node in a red-black binary search tree.
+ *
+ * @param T the type of data stored in the node; must implement the Comparable interface.
+ * @property left the left child of this node. It is null if there is no left child.
+ * @property right the right child of this node. It is null if there is no right child.
+ * @property parent the parent of this node. It is null if this node is the root.
+ * @property data the data stored in this node, of type T.
+ * @property color the color of the node, represented as a boolean (true for red, false for black).
  */
-class Node<Int>(
-    var left: Node<Int>?, var right: Node<Int>?,
-    var parent: Node<Int>?, val data: Int?, var color: Boolean) {
+class Node<T: Comparable<T>>(
+    var left: Node<T>?, var right: Node<T>?,
+    var parent: Node<T>?, val data: T?, var color: Boolean) {
 
     /**
-     * Returns the uncle of the node
+     * Recursively calculates the height of the tree that the node is a part of
+     * @return an integer representing the height of the tree
      */
-    fun uncle(): Node<Int>? {
-        parent?.parent?.let { grandparent ->
-            if (grandparent.left == parent) {
-            return grandparent.right
+    fun getHeight() : Int {
+        if (left == null) {
+            return 0
+        } else {
+            return (1 + max(left!!.getHeight(), right!!.getHeight()))
         }
-            else return grandparent.left
-        } ?: return null
     }
 
+
+    /**
+     * Recursively checks that all leaf nodes are black nil nodes
+     * @return a boolean where true is where every leaf node is black and false
+     * is where any leaf node is not black
+     */
+    fun checkBlackLeaves() : Boolean {
+        if (data == null) {
+            return !color
+        }
+        return left!!.checkBlackLeaves() && right!!.checkBlackLeaves()
+    }
+
+    /**
+     *  Recursively checks that all children of all red nodes are black
+     *  @return a boolean where true means every red node has only black children
+     *  and false is where at least one red node has a red child
+     */
+    fun checkRedChildren() : Boolean {
+        if (data == null) {
+            return true
+        }
+        if (color) {
+            return left!!.checkRedChildren() &&
+                    right!!.checkRedChildren() &&
+                    !(left!!.color || right!!.color)
+        }
+        return left!!.checkRedChildren() &&
+                right!!.checkRedChildren()
+    }
+
+    /**
+     * Recursively counts the number of black nodes in every path towards
+     * a leaf node and throws an "Unequal number of black nodes on each
+     * side" exception if the paths are ever unequal
+     * @return an integer representing the number of black nodes to a leaf
+     * node, including the node itself if it is black.
+     */
+    fun countBlackNodes() : Int {
+        if (data == null) {
+            return 1
+        }
+        var rightBlacks = right?.countBlackNodes() ?: 0
+        var leftBlacks = left?.countBlackNodes() ?: 0
+        if (rightBlacks == leftBlacks) {
+            if (!color) {
+                rightBlacks += 1
+                leftBlacks += 1
+            }
+        } else throw Exception("Unequal number of black nodes on each side")
+        return rightBlacks
+    }
+
+    /**
+     * Returns a string representation of the contents of a Node<T>?
+     * @return the filled out fields of a node's parameters as a string
+     */
+    override fun toString(): String {
+        return "left: ${left?.data}, right: ${right?.data}, " +
+                "parent: ${parent?.data}, data: ${data}, color: ${color})"
+    }
+
+    /**
+     * Left rotates a node
+     */
     fun leftRotate() {
+        right?.let{it.parent = parent}
         parent = right
         right = right?.left
         parent?.let{it.left = this}
         right?.let{it.parent = this}
     }
 
+    /**
+     * Right rotates a node
+     */
     fun rightRotate() {
+        left?.let{it.parent = parent}
         parent = left
         left = left?.right
         parent?.let { it.right = this }
@@ -209,7 +250,7 @@ class Node<Int>(
 
     /**
      * Recolors the parent, grandparent and uncle of the
-     * node
+     * node from black to red or red to black.
      */
     fun recolor() {
         parent?.parent?.let { grandparent ->
@@ -225,4 +266,11 @@ class Node<Int>(
 
 }
 
-enum class Color {RED, BLACK}
+/**
+ * Creates a new black nil node with a null left child, null right child, null
+ * parent and null data when called
+ * @return a black nil node: Node(null, null, null, null, false)
+ */
+fun <T : Comparable<T>>getNilNode(): Node<T> {
+    return Node(null, null, null, null, false)
+}
