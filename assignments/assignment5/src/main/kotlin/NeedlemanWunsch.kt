@@ -69,6 +69,7 @@ class NeedlemanWunsch(private val seqOne: String, private val seqTwo: String) {
      */
     private fun printMatrix() {
         for (i in 0 until height) {
+            print("")
             for (j in 0 until width) {
                 print("(${nwMatrix[i][j].value}, " +
                         "${directionToString(nwMatrix[i][j].direction)})\t")
@@ -97,17 +98,17 @@ class NeedlemanWunsch(private val seqOne: String, private val seqTwo: String) {
      * alignment. Optionally prints the Needleman Wunsch and/or final aligned
      * sequences.
      *
-     * @param printSequences a default false boolean that determines whether the
-     * aligned sequences are printed
      * @param printMatrix a default false boolean that determines whether the
      * associated Needleman-Wunsch matrix is printed
+     * @param printSequences a default true boolean that determines whether the
+     * aligned sequences are printed
      * @return a pair of strings where the first string is seqOne with
      * appropriately placed spacings and the second string is seqTwo with
      * appropriately placed spacings
      */
     fun alignSequences(
         printMatrix: Boolean = false,
-        printSequences: Boolean = false
+        printSequences: Boolean = true
     ) : Pair<String, String> {
         val seqOneBuilder = StringBuilder()
         val seqTwoBuilder = StringBuilder()
